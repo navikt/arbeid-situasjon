@@ -4,7 +4,7 @@
   "homepage": "/arbeid/situasjon",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env REACT_APP_DEV=true craco start",
+    "start": "cross-env REACT_APP_MOCK=true PUBLIC_URL=/  craco start",
     "build": "cross-env REACT_APP_MOCK=false craco build",
     "build:mock": "cross-env REACT_APP_DEV=true craco build",
     "test": "craco test",

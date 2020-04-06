@@ -6,6 +6,8 @@ import Lenke from 'nav-frontend-lenker';
 import {avbrytMetrikk, ferdigMetrikk, svarMetrikk} from "../util/frontendlogger";
 import styles from '../../App.module.less'
 import {AlertStripeSuksess} from "nav-frontend-alertstriper";
+import {NyDialogMeldingData} from "../../api/dataTypes";
+import {postDialog} from "../../api/api";
 
 export type Situasjon = 'PERMITTERT' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
 
@@ -13,7 +15,7 @@ const PERMITTERT: Situasjon = 'PERMITTERT';
 const SKAL_I_JOBB: Situasjon = 'SKAL_I_JOBB';
 const MISTET_JOBB: Situasjon = 'MISTET_JOBB';
 
-function situasjonTilTekst(situasjon: Situasjon): string {
+function situasjonTilTekst(situasjon: string): string {
     switch (situasjon) {
         case 'PERMITTERT':
             return 'Er permittert eller kommer til å bli permittert';
@@ -21,19 +23,34 @@ function situasjonTilTekst(situasjon: Situasjon): string {
             return 'Har fått beskjed fra arbeidsgiver når jeg kan komme tilbake i jobben';
         case 'MISTET_JOBB':
             return 'Har mistet jobben';
+        default:
+            return "Ugyldig svar";
     }
 }
 
 const SPORSMAL = 'Hva er din situasjon nå?';
 
+interface SkjemaData {
+    dialogId?: string;
+}
+
 export default function Skjema() {
 
-    // TODO bytt ut med post
+    const [data, setData] = useState<SkjemaData>({dialogId: undefined});
     const [submitted, setSubmitted] = useState(false);
-    // TODO
-    const loading = false;
+    const [laster, setLaster] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     function submit(value: string) {
+        const tekst = `Spørsmål fra NAV: ${SPORSMAL}\n Svaret mitt: ${situasjonTilTekst(value)}`;
+        const data: NyDialogMeldingData = {tekst: tekst, overskrift: 'Endring av situasjon'};
+        setLoading(true);
+        postDialog(data).then(dialogData => {
+            setData(prev => {
+                return {...prev, dialogId: dialogData.id}
+                });
+            });
+
         console.log('submitted ' + value);
         setSubmitted(true);
         svarMetrikk(value);
@@ -42,7 +59,7 @@ export default function Skjema() {
     if (!submitted) {
         return <Sporsmal loading={loading} onSubmit={submit}/>
     } else {
-        return <Bekreftelse/>
+        return <Bekreftelse dialogId={data.dialogId!}/>
     }
 }
 
@@ -99,8 +116,8 @@ function Sporsmal(props: SporsmalProps) {
     );
 }
 
-function Bekreftelse() {
-    const href = `${process.env.PUBLIC_URL}/dialog/1`;
+function Bekreftelse(props: {dialogId: string}) {
+    const href = `${process.env.PUBLIC_URL}/dialog/${props.dialogId}`;
 
     return (<>
         <Undertittel className={styles.row}>

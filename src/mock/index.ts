@@ -16,5 +16,7 @@ const mock = FetchMock.configure({
 });
 
 mock.post('/veilarbvedtakinfo/api/situasjon', ResponseUtils.statusCode(204));
+mock.post('/veilarbdialog/api/dialog', ({ body }): any => {return {id: '123'}});
+
 
 export default mock;
