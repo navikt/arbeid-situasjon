@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.less';
 import Banner from './components/banner/Banner';
 import { visitMetrikk } from './components/util/frontendlogger';
-import Skjema from "./components/skjema/Skjema";
+import Skjema from './components/skjema/Skjema';
 
 function App() {
-    visitMetrikk();
+    useEffect(() => visitMetrikk(), []);
     return (
         <div className="app">
             <Banner />

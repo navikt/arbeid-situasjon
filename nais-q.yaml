@@ -1,0 +1,32 @@
+apiVersion: 'nais.io/v1alpha1'
+kind: 'Application'
+metadata:
+  name: arbeid-situasjon
+  namespace: {{namespace}}
+  labels:
+    team: pto
+spec:
+  image: {{image}}
+  port: 8080
+  liveness:
+    path: arbeid/situasjon/internal/isAlive
+    initialDelay: 20
+  readiness:
+    path: arbeid/situasjon/internal/selftest
+    initialDelay: 20
+  replicas:
+    min: 2
+    max: 4
+    cpuThresholdPercentage: 50
+  prometheus:
+    enabled: true
+    path: arbeid/situasjon/internal/metrics
+  ingresses:
+    - https://arbeid-situasjon-{{namespace}}.nais.oera-q.local
+    - https://arbeid-situasjon-{{namespace}}.dev-sbs.nais.io
+    - https://www-{{namespace}}.nav.no/arbeid/situasjon
+  vault:
+    enabled: true
+  webproxy: true
+  envFrom:
+    - configmap: pto-config
