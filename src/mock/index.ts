@@ -12,7 +12,7 @@ import FetchMock, { MiddlewareUtils, ResponseUtils } from 'yet-another-fetch-moc
 
 const mock = FetchMock.configure({
     enableFallback: false,
-    middleware: MiddlewareUtils.combine(MiddlewareUtils.delayMiddleware(0), MiddlewareUtils.loggingMiddleware())
+    middleware: MiddlewareUtils.combine(MiddlewareUtils.delayMiddleware(3000), MiddlewareUtils.loggingMiddleware())
 });
 
 mock.post('/veilarbvedtakinfo/api/situasjon', ResponseUtils.statusCode(204));

@@ -49,10 +49,11 @@ export default function Skjema() {
             setData(prev => {
                 return {...prev, dialogId: dialogData.id}
                 });
+                setSubmitted(true);
             });
 
         console.log('submitted ' + value);
-        setSubmitted(true);
+
         svarMetrikk(value);
     }
 
