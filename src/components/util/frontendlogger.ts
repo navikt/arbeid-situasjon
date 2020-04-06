@@ -21,3 +21,6 @@ export function ferdigMetrikk() {
     frontendLogger('arbeid-situasjon.ferdig');
 }
 
+export function svarMetrikk(svar: string){
+    frontendLogger('arbeid-situasjon.situasjon.svar', {}, {svar: svar});
+}

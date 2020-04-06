@@ -3,7 +3,7 @@ import {Normaltekst, Undertittel} from 'nav-frontend-typografi';
 import {RadioPanelGruppe} from 'nav-frontend-skjema';
 import {Hovedknapp} from 'nav-frontend-knapper';
 import Lenke from 'nav-frontend-lenker';
-import {avbrytMetrikk, ferdigMetrikk} from "../util/frontendlogger";
+import {avbrytMetrikk, ferdigMetrikk, svarMetrikk} from "../util/frontendlogger";
 import styles from '../../App.module.less'
 import {AlertStripeSuksess} from "nav-frontend-alertstriper";
 
@@ -36,6 +36,7 @@ export default function Skjema() {
     function submit(value: string) {
         console.log('submitted ' + value);
         setSubmitted(true);
+        svarMetrikk(value);
     }
 
     if (!submitted) {
@@ -62,7 +63,7 @@ function Sporsmal(props: SporsmalProps) {
             </Undertittel>
 
             <RadioPanelGruppe
-                className="spm-row"
+                className={styles.row}
                 legend=""
                 name=""
                 radios={[
@@ -99,7 +100,7 @@ function Sporsmal(props: SporsmalProps) {
 }
 
 function Bekreftelse() {
-    const href = `${process.env.PUBLIC_URL}/arbeidsrettet-dialog/1`;
+    const href = `${process.env.PUBLIC_URL}/dialog/1`;
 
     return (<>
         <Undertittel className={styles.row}>
