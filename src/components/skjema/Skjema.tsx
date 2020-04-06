@@ -6,8 +6,7 @@ import Lenke from 'nav-frontend-lenker';
 import {avbrytMetrikk, ferdigMetrikk, naMetrikk, svarMetrikk} from "../util/frontendlogger";
 import styles from '../../App.module.less'
 import {AlertStripeSuksess} from "nav-frontend-alertstriper";
-import {NyDialogMeldingData} from "../../api/dataTypes";
-import {getSituasjon, postDialog} from "../../api/api";
+import {getSituasjon, postDialog, postSituasjon} from "../../api/api";
 import NavFrontendSpinner from "nav-frontend-spinner";
 
 export type Situasjon = 'PERMITTERT' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
@@ -55,11 +54,15 @@ export default function Skjema() {
 
     function submit(value: string) {
         const tekst = `Spørsmål fra NAV: ${SPORSMAL}\n Svaret mitt: ${situasjonTilTekst(value)}`;
-        const data: NyDialogMeldingData = {tekst: tekst, overskrift: 'Endring av situasjon'};
         setLoading(true);
-        postDialog(data).then(dialogData => {
-            setData(prev => {
-                return {...prev, dialogId: dialogData.id}
+
+        const dialogPromise = postDialog({tekst: tekst, overskrift: 'Endring av situasjon'})
+        const situasjonPromise = postSituasjon({svarId: value, svarTekst: situasjonTilTekst(value)});
+        Promise.all([dialogPromise, situasjonPromise])
+            .then(res => res[0])
+            .then(dialogData => {
+                setData(prev => {
+                    return {...prev, dialogId: dialogData.id}
                 });
                 setSubmitted(true);
             });
@@ -67,8 +70,8 @@ export default function Skjema() {
         svarMetrikk(value);
     }
 
-    if (laster){
-        return <NavFrontendSpinner type="XL" />
+    if (laster) {
+        return <NavFrontendSpinner type="XL"/>
     }
 
     if (!submitted) {
@@ -80,7 +83,7 @@ export default function Skjema() {
     }
 }
 
-function getRadioOptions(tidligereSituasjon: string){
+function getRadioOptions(tidligereSituasjon: string) {
     const radios = [
         {label: situasjonTilTekst(PERMITTERT), value: PERMITTERT},
         {label: situasjonTilTekst(SKAL_I_JOBB), value: SKAL_I_JOBB},
@@ -154,7 +157,7 @@ function Sporsmal(props: SporsmalProps) {
     );
 }
 
-function Bekreftelse(props: {dialogId: string}) {
+function Bekreftelse(props: { dialogId: string }) {
     const href = `${process.env.PUBLIC_URL}/dialog/${props.dialogId}`;
 
     return (<>
@@ -173,7 +176,8 @@ function Bekreftelse(props: {dialogId: string}) {
 
             </AlertStripeSuksess>
         </div>
-        <a className={styles.avbrytKnapp} href={`${process.env.PUBLIC_URL}/veientilarbeid`} onClick={() => ferdigMetrikk()}>
+        <a className={styles.avbrytKnapp} href={`${process.env.PUBLIC_URL}/veientilarbeid`}
+           onClick={() => ferdigMetrikk()}>
             Ferdig
         </a>
     </>);
