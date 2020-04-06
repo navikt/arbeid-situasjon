@@ -26,7 +26,7 @@ export function postDialog(data: NyDialogMeldingData): Promise<DialogData> {
     return fetchData<DialogData>(API_VEILARBDIALOG, {method: 'POST', body: JSON.stringify(data), ...CONFIG});
 }
 
-export function getSituasjon(): Promise<SituasjonData> {
+export function getSituasjon(): Promise<SituasjonData | undefined> {
     return fetchData<SituasjonData>(API_VEILARBVEDTAKINFO, {method: 'GET', ...CONFIG});
 }
 

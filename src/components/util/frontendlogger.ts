@@ -21,6 +21,10 @@ export function ferdigMetrikk() {
     frontendLogger('arbeid-situasjon.ferdig');
 }
 
+export function naMetrikk(type: string){
+    frontendLogger('arbeid-situasjon.situasjon.na', {}, {type: type});
+}
+
 export function svarMetrikk(svar: string){
     frontendLogger('arbeid-situasjon.situasjon.svar', {}, {svar: svar});
 }

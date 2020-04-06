@@ -15,6 +15,7 @@ const mock = FetchMock.configure({
     middleware: MiddlewareUtils.combine(MiddlewareUtils.delayMiddleware(3000), MiddlewareUtils.loggingMiddleware())
 });
 
+mock.get('/veilarbvedtakinfo/api/situasjon', null);
 mock.post('/veilarbvedtakinfo/api/situasjon', ResponseUtils.statusCode(204));
 mock.post('/veilarbdialog/api/dialog', ({ body }): any => {return {id: '123'}});
 

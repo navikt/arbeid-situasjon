@@ -1,13 +1,14 @@
-import React, {useState} from 'react';
-import {Normaltekst, Undertittel} from 'nav-frontend-typografi';
+import React, {useEffect, useState} from 'react';
+import {EtikettLiten, Normaltekst, Element, Undertittel} from 'nav-frontend-typografi';
 import {RadioPanelGruppe} from 'nav-frontend-skjema';
 import {Hovedknapp} from 'nav-frontend-knapper';
 import Lenke from 'nav-frontend-lenker';
-import {avbrytMetrikk, ferdigMetrikk, svarMetrikk} from "../util/frontendlogger";
+import {avbrytMetrikk, ferdigMetrikk, naMetrikk, svarMetrikk} from "../util/frontendlogger";
 import styles from '../../App.module.less'
 import {AlertStripeSuksess} from "nav-frontend-alertstriper";
 import {NyDialogMeldingData} from "../../api/dataTypes";
-import {postDialog} from "../../api/api";
+import {getSituasjon, postDialog} from "../../api/api";
+import NavFrontendSpinner from "nav-frontend-spinner";
 
 export type Situasjon = 'PERMITTERT' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
 
@@ -32,14 +33,25 @@ const SPORSMAL = 'Hva er din situasjon nå?';
 
 interface SkjemaData {
     dialogId?: string;
+    tidligereSituasjon?: string
 }
 
 export default function Skjema() {
 
-    const [data, setData] = useState<SkjemaData>({dialogId: undefined});
+    const [data, setData] = useState<SkjemaData>({});
     const [submitted, setSubmitted] = useState(false);
-    const [laster, setLaster] = useState(false);
+    const [laster, setLaster] = useState(true);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        getSituasjon().then(situasjon => {
+                setData(prev => {
+                    return {...prev, tidligereSituasjon: situasjon?.svarId}
+                });
+                setLaster(false);
+            }
+        )
+    }, [setData, setLaster]);
 
     function submit(value: string) {
         const tekst = `Spørsmål fra NAV: ${SPORSMAL}\n Svaret mitt: ${situasjonTilTekst(value)}`;
@@ -52,19 +64,34 @@ export default function Skjema() {
                 setSubmitted(true);
             });
 
-        console.log('submitted ' + value);
-
         svarMetrikk(value);
     }
 
+    if (laster){
+        return <NavFrontendSpinner type="XL" />
+    }
+
     if (!submitted) {
-        return <Sporsmal loading={loading} onSubmit={submit}/>
+        return <Sporsmal tidligereSituasjon={data.tidligereSituasjon}
+                         loading={loading}
+                         onSubmit={submit}/>
     } else {
         return <Bekreftelse dialogId={data.dialogId!}/>
     }
 }
 
+function getRadioOptions(tidligereSituasjon: string){
+    const radios = [
+        {label: situasjonTilTekst(PERMITTERT), value: PERMITTERT},
+        {label: situasjonTilTekst(SKAL_I_JOBB), value: SKAL_I_JOBB},
+        {label: situasjonTilTekst(MISTET_JOBB), value: MISTET_JOBB},
+    ];
+
+    return radios.filter(r => r.value !== tidligereSituasjon);
+}
+
 interface SporsmalProps {
+    tidligereSituasjon?: string;
     loading: boolean;
     onSubmit: (arg: string) => void;
 }
@@ -74,21 +101,31 @@ function Sporsmal(props: SporsmalProps) {
     const feil = feilState ? 'Velg ett alternativ' : undefined;
     const [value, setValue] = useState<string | undefined>(undefined);
 
+    const tidligereSituasjon = !!props.tidligereSituasjon ? props.tidligereSituasjon : PERMITTERT;
+
+    useEffect(() => {
+        naMetrikk(tidligereSituasjon);
+    }, [tidligereSituasjon]);
+
     return (
         <>
+            <div className={styles.row}>
+                <EtikettLiten>
+                    Din situasjon
+                </EtikettLiten>
+                <Element>
+                    {situasjonTilTekst(tidligereSituasjon)}
+                </Element>
+            </div>
+
             <Undertittel className={styles.row}>
                 {SPORSMAL}
             </Undertittel>
-
             <RadioPanelGruppe
                 className={styles.row}
                 legend=""
                 name=""
-                radios={[
-                    {label: situasjonTilTekst(PERMITTERT), value: PERMITTERT},
-                    {label: situasjonTilTekst(SKAL_I_JOBB), value: SKAL_I_JOBB},
-                    {label: situasjonTilTekst(MISTET_JOBB), value: MISTET_JOBB},
-                ]}
+                radios={getRadioOptions(tidligereSituasjon)}
                 checked={value}
                 onChange={(_, val) => setValue(val)}
                 feil={feil}
