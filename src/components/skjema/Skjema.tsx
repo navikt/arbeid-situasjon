@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
-import {Undertittel} from 'nav-frontend-typografi';
+import {Normaltekst, Undertittel} from 'nav-frontend-typografi';
 import {RadioPanelGruppe} from 'nav-frontend-skjema';
 import {Hovedknapp} from 'nav-frontend-knapper';
 import Lenke from 'nav-frontend-lenker';
 import {avbrytMetrikk} from "../util/frontendlogger";
 import styles from '../../App.module.less'
+import {AlertStripeSuksess} from "nav-frontend-alertstriper";
 
 export type Situasjon = 'PERMITTERT' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
 
@@ -98,10 +99,26 @@ function Sporsmal(props: SporsmalProps) {
 }
 
 function Bekreftelse() {
+    const href = `${process.env.PUBLIC_URL}/arbeidsrettet-dialog/1`;
 
-    return (<div>
-        <Undertittel>
+    return (<>
+        <Undertittel className={styles.row}>
             Takk for tilbakemelding
         </Undertittel>
-    </div>);
+        <div className={styles.row}>
+            <AlertStripeSuksess>
+                <Normaltekst>
+                    Svarene er&nbsp;
+                    <a href={`${href}`}>delt med veilederen din.</a>&nbsp;
+                </Normaltekst>
+                <Normaltekst>
+                    Veilederen vil kontakte deg i løpet av noen dager.
+                </Normaltekst>
+
+            </AlertStripeSuksess>
+        </div>
+        <a className={styles.avbrytKnapp} href={`${process.env.PUBLIC_URL}/veientilarbeid`}>
+            Ferdig
+        </a>
+    </>);
 }
