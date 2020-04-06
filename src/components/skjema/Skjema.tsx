@@ -4,6 +4,7 @@ import {RadioPanelGruppe} from 'nav-frontend-skjema';
 import {Hovedknapp} from 'nav-frontend-knapper';
 import Lenke from 'nav-frontend-lenker';
 import {avbrytMetrikk} from "../util/frontendlogger";
+import styles from '../../App.module.less'
 
 export type Situasjon = 'PERMITTERT' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
 
@@ -39,7 +40,7 @@ export default function Skjema() {
     if (!submitted) {
         return <Sporsmal loading={loading} onSubmit={submit}/>
     } else {
-        return <Bekreftelse />
+        return <Bekreftelse/>
     }
 }
 
@@ -53,43 +54,47 @@ function Sporsmal(props: SporsmalProps) {
     const feil = feilState ? 'Velg ett alternativ' : undefined;
     const [value, setValue] = useState<string | undefined>(undefined);
 
-    return(<div>
-        <Undertittel>
-            {SPORSMAL}
-        </Undertittel>
+    return (
+        <>
+            <Undertittel className={styles.row}>
+                {SPORSMAL}
+            </Undertittel>
 
-        <RadioPanelGruppe
-            className="spm-row"
-            legend=""
-            name=""
-            radios={[
-                {label: situasjonTilTekst(PERMITTERT), value: PERMITTERT},
-                {label: situasjonTilTekst(SKAL_I_JOBB), value: SKAL_I_JOBB},
-                {label: situasjonTilTekst(MISTET_JOBB), value: MISTET_JOBB},
-            ]}
-            checked={value}
-            onChange={(_, val) => setValue(val)}
-            feil={feil}
-        />
-        <Hovedknapp
-            className="send-knapp"
-            spinner={props.loading}
-            disabled={props.loading}
-            onClick={() => {
-                if (value === undefined) {
-                    setFeil(true);
-                } else {
-                    setFeil(false);
-                    props.onSubmit(value);
-                }
-            }}
-        >
-            Send
-        </Hovedknapp>
-        <Lenke href={`${process.env.PUBLIC_URL}/veientilarbeid`} onClick={() => avbrytMetrikk()}>
-            Avbryt
-        </Lenke>
-    </div>);
+            <RadioPanelGruppe
+                className="spm-row"
+                legend=""
+                name=""
+                radios={[
+                    {label: situasjonTilTekst(PERMITTERT), value: PERMITTERT},
+                    {label: situasjonTilTekst(SKAL_I_JOBB), value: SKAL_I_JOBB},
+                    {label: situasjonTilTekst(MISTET_JOBB), value: MISTET_JOBB},
+                ]}
+                checked={value}
+                onChange={(_, val) => setValue(val)}
+                feil={feil}
+            />
+            <Hovedknapp
+                className={styles.sendKnapp}
+                spinner={props.loading}
+                disabled={props.loading}
+                onClick={() => {
+                    if (value === undefined) {
+                        setFeil(true);
+                    } else {
+                        setFeil(false);
+                        props.onSubmit(value);
+                    }
+                }}
+            >
+                Send
+            </Hovedknapp>
+            <Lenke
+                className={styles.avbrytKnapp}
+                href={`${process.env.PUBLIC_URL}/veientilarbeid`} onClick={() => avbrytMetrikk()}>
+                Avbryt
+            </Lenke>
+        </>
+    );
 }
 
 function Bekreftelse() {

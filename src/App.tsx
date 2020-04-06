@@ -1,15 +1,17 @@
 import React, { useEffect } from 'react';
-import './App.less';
 import Banner from './components/banner/Banner';
-import { visitMetrikk } from './components/util/frontendlogger';
 import Skjema from './components/skjema/Skjema';
+import { visitMetrikk } from './components/util/frontendlogger';
+import styles from './App.module.less';
 
 function App() {
     useEffect(() => visitMetrikk(), []);
     return (
-        <div className="app">
+        <div className={styles.app}>
             <Banner />
-            <Skjema />
+            <div className={styles.container}>
+                <Skjema />
+            </div>
         </div>
     );
 }
