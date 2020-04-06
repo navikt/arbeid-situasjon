@@ -3,7 +3,7 @@ import {Normaltekst, Undertittel} from 'nav-frontend-typografi';
 import {RadioPanelGruppe} from 'nav-frontend-skjema';
 import {Hovedknapp} from 'nav-frontend-knapper';
 import Lenke from 'nav-frontend-lenker';
-import {avbrytMetrikk} from "../util/frontendlogger";
+import {avbrytMetrikk, ferdigMetrikk} from "../util/frontendlogger";
 import styles from '../../App.module.less'
 import {AlertStripeSuksess} from "nav-frontend-alertstriper";
 
@@ -117,7 +117,7 @@ function Bekreftelse() {
 
             </AlertStripeSuksess>
         </div>
-        <a className={styles.avbrytKnapp} href={`${process.env.PUBLIC_URL}/veientilarbeid`}>
+        <a className={styles.avbrytKnapp} href={`${process.env.PUBLIC_URL}/veientilarbeid`} onClick={() => ferdigMetrikk()}>
             Ferdig
         </a>
     </>);

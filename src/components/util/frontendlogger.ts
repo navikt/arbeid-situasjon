@@ -16,3 +16,8 @@ export function visitMetrikk() {
 export function avbrytMetrikk() {
     frontendLogger('arbeid-situasjon.avbryt');
 }
+
+export function ferdigMetrikk() {
+    frontendLogger('arbeid-situasjon.ferdig');
+}
+
