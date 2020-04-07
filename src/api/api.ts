@@ -31,5 +31,5 @@ export function getSituasjon(): Promise<SituasjonData | undefined> {
 }
 
 export function postSituasjon(data: NySituasjonData): Promise<void> {
-    return fetchData<void>(API_VEILARBVEDTAKINFO, {method: 'POST', ...CONFIG});
+    return fetchData<void>(API_VEILARBVEDTAKINFO, {method: 'POST', body: JSON.stringify(data), ...CONFIG});
 }
