@@ -14,7 +14,7 @@ proxy:
 
 
 redirect:
-  - from: /arbeid/situasjon/veientilarbeid
-    to: {{VEIENTILARBEID_URL}}
+  - from: /arbeid/situasjon/ditt-nav
+    to: {{DITTNAV_URL}}
   - from: /arbeid/situasjon/dialog
     to: {{ARBEIDSRETTET_DIALOG_URL}}

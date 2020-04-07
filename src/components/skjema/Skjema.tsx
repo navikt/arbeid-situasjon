@@ -176,7 +176,7 @@ function Bekreftelse(props: { dialogId: string }) {
 
             </AlertStripeSuksess>
         </div>
-        <a className={styles.avbrytKnapp} href={`${process.env.PUBLIC_URL}/veientilarbeid`}
+        <a className={"knapp knapp--flat " + styles.avbrytKnapp} href={`${process.env.PUBLIC_URL}/ditt-nav`}
            onClick={() => ferdigMetrikk()}>
             Ferdig
         </a>
