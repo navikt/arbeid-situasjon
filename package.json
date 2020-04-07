@@ -10,7 +10,9 @@
     "test": "craco test",
     "test:coverage": "npm test -- --coverage --watchAll=false",
     "eject": "craco eject",
-    "prettier": "prettier --write \"src/**/*.{ts,tsx}\""
+    "prettier": "prettier --write \"src/**/*.{ts,tsx,less}\"",
+    "heroku-serve": "serve -s build -l $PORT",
+    "heroku-postbuild": "cross-env REACT_APP_MOCK=true PUBLIC_URL=/ craco build"
   },
   "eslintConfig": {
     "extends": "react-app"
