@@ -33,6 +33,7 @@ const SPORSMAL = 'Hva er din situasjon nå?';
 interface SkjemaData {
     dialogId?: string;
     tidligereSituasjon?: string
+    navarendeSituasjon?: string
 }
 
 export default function Skjema() {
@@ -62,7 +63,7 @@ export default function Skjema() {
             .then(res => res[0])
             .then(dialogData => {
                 setData(prev => {
-                    return {...prev, dialogId: dialogData.id}
+                    return {...prev, navarendeSituasjon: value, dialogId: dialogData.id}
                 });
                 setSubmitted(true);
             });
@@ -79,7 +80,7 @@ export default function Skjema() {
                          loading={loading}
                          onSubmit={submit}/>
     } else {
-        return <Bekreftelse dialogId={data.dialogId!}/>
+        return <Bekreftelse dialogId={data.dialogId!} navarendeSituasjon={data.navarendeSituasjon!}/>
     }
 }
 
@@ -157,28 +158,103 @@ function Sporsmal(props: SporsmalProps) {
     );
 }
 
-function Bekreftelse(props: { dialogId: string }) {
+function Bekreftelse(props: { dialogId: string, navarendeSituasjon: string }) {
     const href = `${process.env.PUBLIC_URL}/dialog/${props.dialogId}`;
 
     return (<>
-        <Undertittel className={styles.row}>
-            Takk for tilbakemelding
-        </Undertittel>
-        <div className={styles.row}>
-            <AlertStripeSuksess>
-                <Normaltekst>
-                    Svarene er&nbsp;
-                    <a href={`${href}`}>delt med veilederen din.</a>&nbsp;
-                </Normaltekst>
-                <Normaltekst>
-                    Veilederen vil kontakte deg i løpet av noen dager.
-                </Normaltekst>
-
-            </AlertStripeSuksess>
-        </div>
+        <BekreftelseManager href={href} navarendeSituasjon={props.navarendeSituasjon}/>
         <a className={"knapp knapp--flat " + styles.avbrytKnapp} href={`${process.env.PUBLIC_URL}/ditt-nav`}
            onClick={() => ferdigMetrikk()}>
             Ferdig
         </a>
+    </>);
+}
+
+function BekreftelseManager(props: { navarendeSituasjon: string, href: string }){
+    switch (props.navarendeSituasjon) {
+        case 'PERMITTERT':
+            return <BekreftelsePermittert href={props.href}/>;
+        case 'SKAL_I_JOBB':
+            return <BekreftelseTilbakeIJobb href={props.href}/>;
+        case 'MISTET_JOBB':
+            return <BekreftelseMistetJobb href={props.href}/>;
+        default:
+            return null;
+    }
+}
+
+function BekreftelseMistetJobb(props: { href: string }) {
+    return (<>
+        <Undertittel className={styles.row}>
+            Takk for oppdatert informasjon
+        </Undertittel>
+        <div className={styles.row}>
+            <AlertStripeSuksess>
+                <Normaltekst>
+                    Svaret er&nbsp;
+                    <a href={props.href}>delt med veilederen din.</a>&nbsp;
+                    som vil ta tak i ditt svar
+                </Normaltekst>
+            </AlertStripeSuksess>
+        </div>
+        <Undertittel className={styles.row}>
+            Dette anbefaler vi deg å gjøre nå
+        </Undertittel>
+        <ul>
+            <li><Normaltekst>Sende ny dagpenge søknad</Normaltekst></li>
+            <li><Normaltekst>Sjekk om du har oppdatert CV og jobbprofil på <a href="https://arbeidsplassen.nav.no/">arbeidsplassen.no</a></Normaltekst></li>
+            <li><Normaltekst>Send meldekort hver 14. dag</Normaltekst></li>
+        </ul>
+
+    </>);
+}
+
+function BekreftelseTilbakeIJobb(props: { href: string }) {
+    return (<>
+        <Undertittel className={styles.row}>
+            Gratulerer og takk for oppdatert informasjon
+        </Undertittel>
+        <div className={styles.row}>
+            <AlertStripeSuksess>
+                <Normaltekst>
+                    Svaret er&nbsp;
+                    <a href={props.href}>delt med veilederen din.</a>&nbsp;
+                </Normaltekst>
+            </AlertStripeSuksess>
+        </div>
+        <Undertittel className={styles.row}>
+            Dette anbefaler vi deg å gjøre nå
+        </Undertittel>
+
+        <Normaltekst>
+            I løpet av de 2 neste ukene er det fint om du sender et siste
+            meldekort slik at det viser der at du er tilbake i jobb
+        </Normaltekst>
+    </>);
+}
+
+function BekreftelsePermittert(props: { href: string }) {
+    return (<>
+        <Undertittel className={styles.row}>
+            Takk for oppdatert informasjon
+        </Undertittel>
+        <div className={styles.row}>
+            <AlertStripeSuksess>
+                <Normaltekst>
+                    Svaret er&nbsp;
+                    <a href={props.href}>delt med veilederen din.</a>&nbsp;
+                    som vil ta tak i ditt svar
+                </Normaltekst>
+            </AlertStripeSuksess>
+        </div>
+        <Undertittel className={styles.row}>
+            Dette anbefaler vi deg å gjøre nå
+        </Undertittel>
+        <Normaltekst className={styles.row}>
+            Sjekk "dine saker" for å se om du har riktig pengestøtte
+        </Normaltekst>
+        <Normaltekst className={styles.row}>
+            Hvis du har pengestøtte, fortsett å sende meldekort
+        </Normaltekst>
     </>);
 }
