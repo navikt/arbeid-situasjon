@@ -16,5 +16,5 @@ proxy:
 redirect:
   - from: /arbeid/situasjon/veientilarbeid
     to: {{VEIENTILARBEID_URL}}
-  - from: /dialog
+  - from: /arbeid/situasjon/dialog
     to: {{ARBEIDSRETTET_DIALOG_URL}}
