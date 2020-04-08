@@ -1,6 +1,6 @@
 export interface NyDialogMeldingData {
     tekst: string;
-    dialogId?: string;
+    dialogId?: string | null;
     overskrift?: string;
 }
 

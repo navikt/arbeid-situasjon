@@ -12,11 +12,18 @@ import FetchMock, { MiddlewareUtils, ResponseUtils } from 'yet-another-fetch-moc
 
 const mock = FetchMock.configure({
     enableFallback: false,
-    middleware: MiddlewareUtils.combine(MiddlewareUtils.delayMiddleware(3000), MiddlewareUtils.loggingMiddleware())
+    middleware: MiddlewareUtils.combine(MiddlewareUtils.delayMiddleware(500), MiddlewareUtils.loggingMiddleware())
 });
 
-mock.get('/veilarbvedtakinfo/api/situasjon', null);
-mock.post('/veilarbvedtakinfo/api/situasjon', ResponseUtils.statusCode(204));
+const data = {stuff: null};
+
+mock.get('/veilarbvedtakinfo/api/situasjon', () => data.stuff);
+mock.post('/veilarbvedtakinfo/api/situasjon', ResponseUtils.combine(ResponseUtils.statusCode(204),
+    ({body}) => {
+        data.stuff = body;
+        return null;
+    }
+    ));
 mock.post('/veilarbdialog/api/dialog', ({ body }): any => {return {id: '123'}});
 
 

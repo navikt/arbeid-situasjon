@@ -3,11 +3,14 @@ import {EtikettLiten, Normaltekst, Element, Undertittel} from 'nav-frontend-typo
 import {RadioPanelGruppe} from 'nav-frontend-skjema';
 import {Hovedknapp} from 'nav-frontend-knapper';
 import Lenke from 'nav-frontend-lenker';
+import {AlertStripeSuksess} from "nav-frontend-alertstriper";
+import NavFrontendSpinner from "nav-frontend-spinner";
+import queryString from "query-string"
 import {avbrytMetrikk, ferdigMetrikk, naMetrikk, svarMetrikk} from "../util/frontendlogger";
 import styles from '../../App.module.less'
-import {AlertStripeSuksess} from "nav-frontend-alertstriper";
 import {getSituasjon, postDialog, postSituasjon} from "../../api/api";
-import NavFrontendSpinner from "nav-frontend-spinner";
+import {firstValueOfArrayOrValue} from "../util/utils";
+import AlleredeSvart from "../alerts/AlleredeSvart";
 
 export type Situasjon = 'PERMITTERT' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
 
@@ -36,28 +39,45 @@ interface SkjemaData {
     navarendeSituasjon?: string
 }
 
+
+//TODO: redo state management if more questions
 export default function Skjema() {
 
     const [data, setData] = useState<SkjemaData>({});
-    const [submitted, setSubmitted] = useState(false);
     const [laster, setLaster] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [pageId, setPageId] = useState(0);
+
+    const dialogId = firstValueOfArrayOrValue(queryString.parse(window.location.search)["dialogId"]);
 
     useEffect(() => {
-        getSituasjon().then(situasjon => {
-                setData(prev => {
-                    return {...prev, tidligereSituasjon: situasjon?.svarId}
-                });
-                setLaster(false);
-            }
-        )
-    }, [setData, setLaster]);
+        const func = (event: any) => {
+            setPageId(event.state.pageId)
+        };
+
+        window.addEventListener('popstate', func);
+        return () => window.removeEventListener('popstate', func);
+    },[setLaster, setPageId]);
+
+
+    useEffect(() => {
+        if(pageId === 0) {
+            setLaster(true);
+            getSituasjon().then(situasjon => {
+                    setData(prev => {
+                        return {...prev, tidligereSituasjon: situasjon?.svarId}
+                    });
+                    setLaster(false);
+                }
+            )
+        }
+    }, [setData, setLaster, pageId]);
 
     function submit(value: string) {
         const tekst = `Spørsmål fra NAV: ${SPORSMAL}\n Svaret mitt: ${situasjonTilTekst(value)}`;
         setLoading(true);
 
-        const dialogPromise = postDialog({tekst: tekst, overskrift: 'Endring av situasjon'})
+        const dialogPromise = postDialog({dialogId: dialogId, tekst: tekst, overskrift: 'Endring av situasjon'});
         const situasjonPromise = postSituasjon({svarId: value, svarTekst: situasjonTilTekst(value)});
         Promise.all([dialogPromise, situasjonPromise])
             .then(res => res[0])
@@ -65,7 +85,10 @@ export default function Skjema() {
                 setData(prev => {
                     return {...prev, navarendeSituasjon: value, dialogId: dialogData.id}
                 });
-                setSubmitted(true);
+                window.history.replaceState({pageId: 0}, 'Endring av min situasjon', `?dialogId=${dialogData.id}`);
+                window.history.pushState({pageId: 1}, 'Endring av min situasjon', '/');
+                setLoading(false);
+                setPageId(1);
             });
 
         svarMetrikk(value);
@@ -75,9 +98,10 @@ export default function Skjema() {
         return <NavFrontendSpinner type="XL"/>
     }
 
-    if (!submitted) {
+    if (pageId === 0) {
         return <Sporsmal tidligereSituasjon={data.tidligereSituasjon}
                          loading={loading}
+                         dialogId={dialogId}
                          onSubmit={submit}/>
     } else {
         return <Bekreftelse dialogId={data.dialogId!} navarendeSituasjon={data.navarendeSituasjon!}/>
@@ -98,6 +122,7 @@ interface SporsmalProps {
     tidligereSituasjon?: string;
     loading: boolean;
     onSubmit: (arg: string) => void;
+    dialogId?: string | null;
 }
 
 function Sporsmal(props: SporsmalProps) {
@@ -121,7 +146,7 @@ function Sporsmal(props: SporsmalProps) {
                     {situasjonTilTekst(tidligereSituasjon)}
                 </Element>
             </div>
-
+            <AlleredeSvart visible={!!props.dialogId} className={styles.row}/>
             <Undertittel className={styles.row}>
                 {SPORSMAL}
             </Undertittel>
