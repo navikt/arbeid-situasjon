@@ -213,7 +213,7 @@ function BekreftelseMistetJobb(props: { href: string }) {
         <Undertittel className={styles.row}>
             Takk for oppdatert informasjon
         </Undertittel>
-        <div className={styles.row}>
+        <div className={styles.rowExtraMargin}>
             <AlertStripeSuksess>
                 <Normaltekst>
                     Svaret er&nbsp;
@@ -222,7 +222,7 @@ function BekreftelseMistetJobb(props: { href: string }) {
                 </Normaltekst>
             </AlertStripeSuksess>
         </div>
-        <Undertittel className={styles.row}>
+        <Undertittel className={styles.w100}>
             Dette anbefaler vi deg å gjøre nå
         </Undertittel>
         <ul>
@@ -239,7 +239,7 @@ function BekreftelseTilbakeIJobb(props: { href: string }) {
         <Undertittel className={styles.row}>
             Gratulerer og takk for oppdatert informasjon
         </Undertittel>
-        <div className={styles.row}>
+        <div className={styles.rowExtraMargin}>
             <AlertStripeSuksess>
                 <Normaltekst>
                     Svaret er&nbsp;
@@ -263,7 +263,7 @@ function BekreftelsePermittert(props: { href: string }) {
         <Undertittel className={styles.row}>
             Takk for oppdatert informasjon
         </Undertittel>
-        <div className={styles.row}>
+        <div className={styles.rowExtraMargin}>
             <AlertStripeSuksess>
                 <Normaltekst>
                     Svaret er&nbsp;
