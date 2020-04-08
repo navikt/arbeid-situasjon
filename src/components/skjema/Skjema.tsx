@@ -176,7 +176,7 @@ function Sporsmal(props: SporsmalProps) {
             </Hovedknapp>
             <Lenke
                 className={styles.avbrytKnapp}
-                href={`${process.env.PUBLIC_URL}/veientilarbeid`} onClick={() => avbrytMetrikk()}>
+                href={`${process.env.PUBLIC_URL}/ditt-nav`} onClick={() => avbrytMetrikk()}>
                 Avbryt
             </Lenke>
         </>
