@@ -46,7 +46,8 @@ export default function Skjema() {
     const [data, setData] = useState<SkjemaData>({});
     const [laster, setLaster] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [pageId, setPageId] = useState(0);
+    const initalPageId = firstValueOfArrayOrValue(queryString.parse(window.location.search)["pageId"]) ?? 0;
+    const [pageId, setPageId] = useState(initalPageId);
 
     const dialogId = firstValueOfArrayOrValue(queryString.parse(window.location.search)["dialogId"]);
 
@@ -61,7 +62,6 @@ export default function Skjema() {
 
 
     useEffect(() => {
-        if(pageId === 0) {
             setLaster(true);
             getSituasjon().then(situasjon => {
                     setData(prev => {
@@ -70,8 +70,7 @@ export default function Skjema() {
                     setLaster(false);
                 }
             )
-        }
-    }, [setData, setLaster, pageId]);
+    }, [setData, setLaster]);
 
     function submit(value: string) {
         const tekst = `Spørsmål fra NAV: ${SPORSMAL}\n Svaret mitt: ${situasjonTilTekst(value)}`;
@@ -86,7 +85,7 @@ export default function Skjema() {
                     return {...prev, navarendeSituasjon: value, dialogId: dialogData.id}
                 });
                 window.history.replaceState({pageId: 0}, 'Endring av min situasjon', `?dialogId=${dialogData.id}`);
-                window.history.pushState({pageId: 1}, 'Endring av min situasjon', '/');
+                window.history.pushState({pageId: 1}, 'Endring av min situasjon', `?dialogId=${dialogData.id}&pageId=1`);
                 setLoading(false);
                 setPageId(1);
             });
@@ -104,7 +103,9 @@ export default function Skjema() {
                          dialogId={dialogId}
                          onSubmit={submit}/>
     } else {
-        return <Bekreftelse dialogId={data.dialogId!} navarendeSituasjon={data.navarendeSituasjon!}/>
+        const situasjon = data.navarendeSituasjon ?? data.tidligereSituasjon ?? PERMITTERT;
+        const finalDialogId = data.dialogId ?? dialogId;
+        return <Bekreftelse dialogId={finalDialogId!} navarendeSituasjon={situasjon}/>
     }
 }
 
