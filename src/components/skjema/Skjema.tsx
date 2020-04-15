@@ -139,7 +139,7 @@ function Sporsmal(props: SporsmalProps) {
 
     return (
         <>
-            <div className={styles.tiligereRow}>
+            <div className={styles.tidligereRow}>
                 <EtikettLiten>
                     Situasjonen din
                 </EtikettLiten>
