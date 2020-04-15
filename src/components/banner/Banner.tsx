@@ -5,7 +5,7 @@ import styles from './Banner.module.less';
 function Banner() {
     return (
         <div className={styles.banner}>
-            <Systemtittel tag="h1">Endring av min situasjon</Systemtittel>
+            <Systemtittel tag="h1">Endring av situasjon</Systemtittel>
         </div>
     );
 }

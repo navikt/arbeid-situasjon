@@ -31,7 +31,7 @@ function situasjonTilTekst(situasjon: string): string {
     }
 }
 
-const SPORSMAL = 'Hva er din situasjon nå?';
+const SPORSMAL = 'Hva er situasjonen din nå?';
 
 interface SkjemaData {
     dialogId?: string;
@@ -141,7 +141,7 @@ function Sporsmal(props: SporsmalProps) {
         <>
             <div className={styles.row}>
                 <EtikettLiten>
-                    Din situasjon
+                    Situasjonen din
                 </EtikettLiten>
                 <Element>
                     {situasjonTilTekst(tidligereSituasjon)}
@@ -218,8 +218,7 @@ function BekreftelseMistetJobb(props: { href: string }) {
             <AlertStripeSuksess>
                 <Normaltekst>
                     Svaret er&nbsp;
-                    <a href={props.href}>delt med veilederen din.</a>&nbsp;
-                    som vil ta tak i ditt svar
+                    <a href={props.href}>delt med veilederen din</a>.
                 </Normaltekst>
             </AlertStripeSuksess>
         </div>
@@ -268,8 +267,7 @@ function BekreftelsePermittert(props: { href: string }) {
             <AlertStripeSuksess>
                 <Normaltekst>
                     Svaret er&nbsp;
-                    <a href={props.href}>delt med veilederen din.</a>&nbsp;
-                    som vil ta tak i ditt svar
+                    <a href={props.href}>delt med veilederen din</a>.
                 </Normaltekst>
             </AlertStripeSuksess>
         </div>
