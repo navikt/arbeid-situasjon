@@ -15,7 +15,7 @@ export interface DialogData {
 }
 
 export interface SituasjonData {
-    oprettet: string
+    opprettet: string
     endretAv: string
     svarId: string
     svarTekst: string
