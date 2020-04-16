@@ -8,8 +8,13 @@ proxy:
   - contextPath: "/arbeid/situasjon/veilarbvedtakinfo"
     baseUrl: "http://veilarbproxy/veilarbvedtakinfo"
     requestRewrite: REMOVE_CONTEXT_PATH
+  - contextPath: "/arbeid/situasjon/veilarbdialog"
+    baseUrl: "http://veilarbproxy/veilarbdialog"
+    requestRewrite: REMOVE_CONTEXT_PATH
 
 
 redirect:
-  - from: /arbeid/situasjon/veientilarbeid
-    to: {{VEIENTILARBEID_URL}}
+  - from: /arbeid/situasjon/ditt-nav
+    to: {{DITTNAV_URL}}
+  - from: /arbeid/situasjon/dialog
+    to: {{ARBEIDSRETTET_DIALOG_URL}}
