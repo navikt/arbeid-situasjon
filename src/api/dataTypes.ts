@@ -25,3 +25,10 @@ export interface NySituasjonData {
     svarId: string
     svarTekst: string
 }
+
+export interface OppfolgingData {
+    reservasjonKRR: boolean;
+    kanVarsles: boolean;
+    manuell: boolean;
+    underOppfolging: boolean;
+}

@@ -3,14 +3,15 @@ import {EtikettLiten, Normaltekst, Element, Undertittel} from 'nav-frontend-typo
 import {RadioPanelGruppe} from 'nav-frontend-skjema';
 import {Hovedknapp} from 'nav-frontend-knapper';
 import Lenke from 'nav-frontend-lenker';
-import {AlertStripeSuksess} from "nav-frontend-alertstriper";
+import {AlertStripeAdvarsel, AlertStripeSuksess} from "nav-frontend-alertstriper";
 import NavFrontendSpinner from "nav-frontend-spinner";
 import queryString from "query-string"
 import {avbrytMetrikk, ferdigMetrikk, naMetrikk, svarMetrikk} from "../util/frontendlogger";
 import styles from '../../App.module.less'
-import {getSituasjon, postDialog, postSituasjon} from "../../api/api";
+import {getOppfolging, getSituasjon, postDialog, postSituasjon} from "../../api/api";
 import {firstValueOfArrayOrValue} from "../util/utils";
 import AlleredeSvart from "../alerts/AlleredeSvart";
+import {OppfolgingData} from "../../api/dataTypes";
 
 export type Situasjon = 'PERMITTERT' | 'PERMITTERT_MED_MIDLERTIDIG_JOBB' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
 
@@ -42,6 +43,20 @@ interface SkjemaData {
     navarendeSituasjon?: string
 }
 
+function invalidOppfolging(oppfolging: OppfolgingData | undefined){
+    if (!oppfolging){
+        return true;
+    }
+
+    return !oppfolging.underOppfolging || !oppfolging.kanVarsles || oppfolging.manuell || oppfolging.reservasjonKRR;
+}
+
+function StatusAdvarsel(){
+    return <div className={styles.alert}>
+        <AlertStripeAdvarsel>Du må være registrert hos NAV for å ha tilgang.</AlertStripeAdvarsel>
+    </div>
+}
+
 
 //TODO: redo state management if more questions
 export default function Skjema() {
@@ -51,6 +66,7 @@ export default function Skjema() {
     const [loading, setLoading] = useState(false);
     const initalPageId = firstValueOfArrayOrValue(queryString.parse(window.location.search)["pageId"]) ?? 0;
     const [pageId, setPageId] = useState(initalPageId);
+    const [oppfolging, setOppfolging] = useState<undefined | OppfolgingData>();
 
     const dialogId = firstValueOfArrayOrValue(queryString.parse(window.location.search)["dialogId"]);
 
@@ -66,10 +82,14 @@ export default function Skjema() {
 
     useEffect(() => {
             setLaster(true);
-            getSituasjon().then(situasjon => {
+            Promise.all([getSituasjon(), getOppfolging()]).then(data => {
+                    const situasjon = data[0];
+                    const oppfolging = data[1];
+
                     setData(prev => {
                         return {...prev, tidligereSituasjon: situasjon?.svarId}
                     });
+                    setOppfolging(oppfolging);
                     setLaster(false);
                 }
             )
@@ -98,6 +118,10 @@ export default function Skjema() {
 
     if (laster) {
         return <NavFrontendSpinner type="XL"/>
+    }
+
+    if (invalidOppfolging(oppfolging)){
+        return <StatusAdvarsel/>
     }
 
     if (pageId === 0) {

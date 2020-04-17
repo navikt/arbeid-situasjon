@@ -27,4 +27,23 @@ mock.post('/veilarbvedtakinfo/api/situasjon', ResponseUtils.combine(ResponseUtil
 mock.post('/veilarbdialog/api/dialog', ({ body }): any => {return {id: '123'}});
 
 
+const oppfolging = {
+    fnr: null,
+    veilederId: '101010',
+    reservasjonKRR: false,
+    manuell: false,
+    underOppfolging: true,
+    underKvp: false,
+    oppfolgingUtgang: null,
+    gjeldendeEskaleringsvarsel: null,
+    kanStarteOppfolging: false,
+    avslutningStatus: null,
+    harSkriveTilgang: true,
+    kanReaktiveres: false,
+    kanVarsles: true,
+    inaktiveringsdato: '2018-08-31T10:46:10.971+01:00'
+};
+mock.get('/veilarboppfolging/api/oppfolging', oppfolging);
+
+
 export default mock;

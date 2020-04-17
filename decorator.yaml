@@ -11,6 +11,10 @@ proxy:
   - contextPath: "/arbeid/situasjon/veilarbdialog"
     baseUrl: "http://veilarbproxy/veilarbdialog"
     requestRewrite: REMOVE_CONTEXT_PATH
+  - contextPath: '/arbeid/situasjon/veilarboppfolging'
+    baseUrl: 'http://veilarbproxy/veilarboppfolging'
+    requestRewrite: REMOVE_CONTEXT_PATH
+
 
 
 redirect:
