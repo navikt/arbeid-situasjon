@@ -12,9 +12,10 @@ import {getSituasjon, postDialog, postSituasjon} from "../../api/api";
 import {firstValueOfArrayOrValue} from "../util/utils";
 import AlleredeSvart from "../alerts/AlleredeSvart";
 
-export type Situasjon = 'PERMITTERT' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
+export type Situasjon = 'PERMITTERT' | 'PERMITTERT_MED_MIDLERTIDIG_JOBB' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
 
 const PERMITTERT: Situasjon = 'PERMITTERT';
+const PERMITTERT_MED_MIDLERTIDIG_JOBB: Situasjon = 'PERMITTERT_MED_MIDLERTIDIG_JOBB';
 const SKAL_I_JOBB: Situasjon = 'SKAL_I_JOBB';
 const MISTET_JOBB: Situasjon = 'MISTET_JOBB';
 
@@ -23,9 +24,11 @@ function situasjonTilTekst(situasjon: string): string {
         case 'PERMITTERT':
             return 'Er permittert eller kommer til å bli permittert';
         case 'SKAL_I_JOBB':
-            return 'Har fått beskjed fra arbeidsgiver når jeg kan komme tilbake i jobben';
+            return 'Arbeidsgiver har gitt beskjed om når jeg skal tilbake på jobb';
         case 'MISTET_JOBB':
-            return 'Har mistet jobben';
+            return 'Arbeidsledig: har mistet eller kommer til å miste jobben';
+        case 'PERMITTERT_MED_MIDLERTIDIG_JOBB':
+            return 'Er fortsatt permittert, men har en annen midlertidig jobb';
         default:
             return "Ugyldig svar";
     }
@@ -112,6 +115,7 @@ export default function Skjema() {
 function getRadioOptions(tidligereSituasjon: string) {
     const radios = [
         {label: situasjonTilTekst(PERMITTERT), value: PERMITTERT},
+        {label: situasjonTilTekst(PERMITTERT_MED_MIDLERTIDIG_JOBB), value: PERMITTERT_MED_MIDLERTIDIG_JOBB},
         {label: situasjonTilTekst(SKAL_I_JOBB), value: SKAL_I_JOBB},
         {label: situasjonTilTekst(MISTET_JOBB), value: MISTET_JOBB},
     ];
@@ -200,6 +204,7 @@ function BekreftelseManager(props: { navarendeSituasjon: string, href: string })
     switch (props.navarendeSituasjon) {
         case 'PERMITTERT':
             return <BekreftelsePermittert href={props.href}/>;
+        case 'PERMITTERT_MED_MIDLERTIDIG_JOBB':
         case 'SKAL_I_JOBB':
             return <BekreftelseTilbakeIJobb href={props.href}/>;
         case 'MISTET_JOBB':
