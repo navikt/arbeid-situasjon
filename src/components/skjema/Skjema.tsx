@@ -43,12 +43,18 @@ interface SkjemaData {
     navarendeSituasjon?: string
 }
 
+
+function erProd() {
+    //trengs da ingen av brukerne er registrert i krr i testmiljø
+    return window.location.hostname === 'www.nav.no' || window.location.hostname === 'app.adeo.no';
+}
+
 function invalidOppfolging(oppfolging: OppfolgingData | undefined){
     if (!oppfolging){
         return true;
     }
 
-    return !oppfolging.underOppfolging || !oppfolging.kanVarsles || oppfolging.manuell || oppfolging.reservasjonKRR;
+    return !oppfolging.underOppfolging || (!oppfolging.kanVarsles && erProd()) || oppfolging.manuell || oppfolging.reservasjonKRR;
 }
 
 function StatusAdvarsel(){
