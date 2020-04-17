@@ -115,9 +115,9 @@ export default function Skjema() {
 function getRadioOptions(tidligereSituasjon: string) {
     const radios = [
         {label: situasjonTilTekst(PERMITTERT), value: PERMITTERT},
-        {label: situasjonTilTekst(PERMITTERT_MED_MIDLERTIDIG_JOBB), value: PERMITTERT_MED_MIDLERTIDIG_JOBB},
         {label: situasjonTilTekst(SKAL_I_JOBB), value: SKAL_I_JOBB},
         {label: situasjonTilTekst(MISTET_JOBB), value: MISTET_JOBB},
+        {label: situasjonTilTekst(PERMITTERT_MED_MIDLERTIDIG_JOBB), value: PERMITTERT_MED_MIDLERTIDIG_JOBB},
     ];
 
     return radios.filter(r => r.value !== tidligereSituasjon);
