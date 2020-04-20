@@ -3,18 +3,20 @@ import {EtikettLiten, Normaltekst, Element, Undertittel} from 'nav-frontend-typo
 import {RadioPanelGruppe} from 'nav-frontend-skjema';
 import {Hovedknapp} from 'nav-frontend-knapper';
 import Lenke from 'nav-frontend-lenker';
-import {AlertStripeSuksess} from "nav-frontend-alertstriper";
+import {AlertStripeAdvarsel, AlertStripeSuksess} from "nav-frontend-alertstriper";
 import NavFrontendSpinner from "nav-frontend-spinner";
 import queryString from "query-string"
 import {avbrytMetrikk, ferdigMetrikk, naMetrikk, svarMetrikk} from "../util/frontendlogger";
 import styles from '../../App.module.less'
-import {getSituasjon, postDialog, postSituasjon} from "../../api/api";
+import {getOppfolging, getSituasjon, postDialog, postSituasjon} from "../../api/api";
 import {firstValueOfArrayOrValue} from "../util/utils";
 import AlleredeSvart from "../alerts/AlleredeSvart";
+import {OppfolgingData} from "../../api/dataTypes";
 
-export type Situasjon = 'PERMITTERT' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
+export type Situasjon = 'PERMITTERT' | 'PERMITTERT_MED_MIDLERTIDIG_JOBB' | 'SKAL_I_JOBB' | 'MISTET_JOBB';
 
 const PERMITTERT: Situasjon = 'PERMITTERT';
+const PERMITTERT_MED_MIDLERTIDIG_JOBB: Situasjon = 'PERMITTERT_MED_MIDLERTIDIG_JOBB';
 const SKAL_I_JOBB: Situasjon = 'SKAL_I_JOBB';
 const MISTET_JOBB: Situasjon = 'MISTET_JOBB';
 
@@ -23,9 +25,11 @@ function situasjonTilTekst(situasjon: string): string {
         case 'PERMITTERT':
             return 'Er permittert eller kommer til å bli permittert';
         case 'SKAL_I_JOBB':
-            return 'Har fått beskjed fra arbeidsgiver når jeg kan komme tilbake i jobben';
+            return 'Arbeidsgiver har gitt beskjed om når jeg skal tilbake på jobb';
         case 'MISTET_JOBB':
-            return 'Har mistet jobben';
+            return 'Arbeidsledig: har mistet eller kommer til å miste jobben';
+        case 'PERMITTERT_MED_MIDLERTIDIG_JOBB':
+            return 'Er fortsatt permittert, men har en annen midlertidig jobb';
         default:
             return "Ugyldig svar";
     }
@@ -40,6 +44,26 @@ interface SkjemaData {
 }
 
 
+function erProd() {
+    //trengs da ingen av brukerne er registrert i krr i testmiljø
+    return window.location.hostname === 'www.nav.no' || window.location.hostname === 'app.adeo.no';
+}
+
+function invalidOppfolging(oppfolging: OppfolgingData | undefined){
+    if (!oppfolging){
+        return true;
+    }
+
+    return !oppfolging.underOppfolging || (!oppfolging.kanVarsles && erProd()) || oppfolging.manuell || oppfolging.reservasjonKRR;
+}
+
+function StatusAdvarsel(){
+    return <div className={styles.alert}>
+        <AlertStripeAdvarsel>Du må være registrert hos NAV for å ha tilgang.</AlertStripeAdvarsel>
+    </div>
+}
+
+
 //TODO: redo state management if more questions
 export default function Skjema() {
 
@@ -48,6 +72,7 @@ export default function Skjema() {
     const [loading, setLoading] = useState(false);
     const initalPageId = firstValueOfArrayOrValue(queryString.parse(window.location.search)["pageId"]) ?? 0;
     const [pageId, setPageId] = useState(initalPageId);
+    const [oppfolging, setOppfolging] = useState<undefined | OppfolgingData>();
 
     const dialogId = firstValueOfArrayOrValue(queryString.parse(window.location.search)["dialogId"]);
 
@@ -63,10 +88,14 @@ export default function Skjema() {
 
     useEffect(() => {
             setLaster(true);
-            getSituasjon().then(situasjon => {
+            Promise.all([getSituasjon(), getOppfolging()]).then(data => {
+                    const situasjon = data[0];
+                    const oppfolging = data[1];
+
                     setData(prev => {
                         return {...prev, tidligereSituasjon: situasjon?.svarId}
                     });
+                    setOppfolging(oppfolging);
                     setLaster(false);
                 }
             )
@@ -97,6 +126,10 @@ export default function Skjema() {
         return <NavFrontendSpinner type="XL"/>
     }
 
+    if (invalidOppfolging(oppfolging)){
+        return <StatusAdvarsel/>
+    }
+
     if (pageId === 0) {
         return <Sporsmal tidligereSituasjon={data.tidligereSituasjon}
                          loading={loading}
@@ -114,6 +147,7 @@ function getRadioOptions(tidligereSituasjon: string) {
         {label: situasjonTilTekst(PERMITTERT), value: PERMITTERT},
         {label: situasjonTilTekst(SKAL_I_JOBB), value: SKAL_I_JOBB},
         {label: situasjonTilTekst(MISTET_JOBB), value: MISTET_JOBB},
+        {label: situasjonTilTekst(PERMITTERT_MED_MIDLERTIDIG_JOBB), value: PERMITTERT_MED_MIDLERTIDIG_JOBB},
     ];
 
     return radios.filter(r => r.value !== tidligereSituasjon);
@@ -200,6 +234,7 @@ function BekreftelseManager(props: { navarendeSituasjon: string, href: string })
     switch (props.navarendeSituasjon) {
         case 'PERMITTERT':
             return <BekreftelsePermittert href={props.href}/>;
+        case 'PERMITTERT_MED_MIDLERTIDIG_JOBB':
         case 'SKAL_I_JOBB':
             return <BekreftelseTilbakeIJobb href={props.href}/>;
         case 'MISTET_JOBB':
