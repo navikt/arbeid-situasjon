@@ -182,13 +182,10 @@ function Sporsmal(props: SporsmalProps) {
                 </Element>
             </div>
             <AlleredeSvart visible={!!props.dialogId} className={styles.row}/>
-            <Undertittel className={styles.row}>
-                {SPORSMAL}
-            </Undertittel>
             <RadioPanelGruppe
                 className={styles.row}
-                legend=""
-                name=""
+                legend={<Undertittel className={styles.row}>{SPORSMAL}</Undertittel>}
+                name="situasjon"
                 radios={getRadioOptions(tidligereSituasjon)}
                 checked={value}
                 onChange={(_, val) => setValue(val)}
