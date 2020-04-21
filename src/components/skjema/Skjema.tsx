@@ -59,7 +59,7 @@ function invalidOppfolging(oppfolging: OppfolgingData | undefined){
 
 function StatusAdvarsel(){
     return <div className={styles.alert}>
-        <AlertStripeAdvarsel>Du må være registrert hos NAV for å ha tilgang.</AlertStripeAdvarsel>
+        <AlertStripeAdvarsel>Du har ikke tilgang til denne siden.</AlertStripeAdvarsel>
     </div>
 }
 
