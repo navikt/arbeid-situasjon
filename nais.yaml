@@ -35,3 +35,4 @@ spec:
   webproxy: true
   envFrom:
     - configmap: pto-config
+    - configmap: loginservice-idporten
